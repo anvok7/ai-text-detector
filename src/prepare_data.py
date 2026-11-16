@@ -21,16 +21,18 @@ def prepare_data():
             if answer and answer.strip():
                 rows.append({
                     "text": answer.strip(),
-                    "label": 0,
-                    "source": record["source"]
+                     "label": 0,
+                     "source": record["source"],
+                     "group": record["question"]
                 })
 
         for answer in chatgpt_answers:
             if answer and answer.strip():
                 rows.append({
                     "text": answer.strip(),
-                    "label": 1,
-                    "source": record["source"]
+                     "label": 0,
+                     "source": record["source"],
+                     "group": record["question"]
                 })
 
     df = pd.DataFrame(rows)
@@ -42,7 +44,7 @@ def prepare_data():
 
     df = df[df["text_length"] >= 20]
 
-    df = df[["text", "label", "source"]]
+    df = df[["text", "label", "source","group"]]
 
     return df
 
