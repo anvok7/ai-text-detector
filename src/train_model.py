@@ -12,12 +12,12 @@ from sklearn.metrics import (
     accuracy_score,
     classification_report,
     confusion_matrix,
+    f1_score,
     precision_score,
     recall_score,
-    f1_score,
 )
 from sklearn.model_selection import train_test_split
-from sklearn.pipeline import Pipeline
+from sklearn.pipeline import FeatureUnion, Pipeline
 
 
 DATA_PATH = "data/raw/hc3_processed.csv"
@@ -46,18 +46,30 @@ def main():
     print(f"Training samples: {len(X_train)}")
     print(f"Testing samples: {len(X_test)}")
 
+    word_tfidf = TfidfVectorizer(
+        lowercase=True,
+        stop_words="english",
+        ngram_range=(1, 2),
+        min_df=2,
+        max_features=100000,
+        sublinear_tf=True
+    )
+
+    char_tfidf = TfidfVectorizer(
+        analyzer="char",
+        ngram_range=(3, 5),
+        min_df=3,
+        max_features=100000,
+        sublinear_tf=True
+    )
+
+    features = FeatureUnion([
+        ("word_tfidf", word_tfidf),
+        ("char_tfidf", char_tfidf)
+    ])
+
     pipeline = Pipeline([
-        (
-            "tfidf",
-            TfidfVectorizer(
-                lowercase=True,
-                stop_words="english",
-                ngram_range=(1, 2),
-                min_df=2,
-                max_features=100000,
-                sublinear_tf=True
-            )
-        ),
+        ("features", features),
         (
             "classifier",
             LogisticRegression(
@@ -89,6 +101,7 @@ def main():
 
     print("\nClassification Report")
     print("---------------------")
+
     print(
         classification_report(
             y_test,
@@ -132,7 +145,11 @@ def main():
 
     plt.tight_layout()
 
-    plt.savefig("results/confusion_matrix.png", dpi=300)
+    plt.savefig(
+        "results/confusion_matrix.png",
+        dpi=300
+    )
+
     plt.close()
 
     print("\nModel saved to:", MODEL_PATH)

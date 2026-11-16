@@ -63,10 +63,10 @@ if st.button("Analyze Text"):
         st.subheader("Prediction")
 
         if prediction == 1:
-            st.error("🤖 AI-generated text")
+            st.error("🤖 Likely AI-generated")
             confidence = ai_probability
         else:
-            st.success("👤 Human-written text")
+            st.success("👤 Likely Human-written")
             confidence = human_probability
 
         st.metric(
